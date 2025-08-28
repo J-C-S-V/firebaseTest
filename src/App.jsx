@@ -1,5 +1,11 @@
 import { getFirestore, doc, getDoc } from "firebase/firestore";
 import { useState, useEffect } from "react";
+import {
+  createUserWithEmailAndPassword,
+  getAuth,
+  // signInWithCredential,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
@@ -24,9 +30,13 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 // const analytics = getAnalytics(app);
 const db = getFirestore(app);
+const auth = getAuth(app);
 
 function App() {
   const [name, setName] = useState();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     async function testFirestore() {
@@ -49,9 +59,67 @@ function App() {
     testFirestore();
   }, []);
 
+  const signUp = () => {
+    createUserWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        setUser(userCredential.user);
+        console.log("User signed up:", userCredential.user);
+      })
+      .catch((error) => {
+        console.error("Error signing up:", error);
+      });
+  };
+
+  const signIn = () => {
+    signInWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        setUser(userCredential.user);
+        console.log("User signed in:", userCredential.user);
+      })
+      .catch((error) => {
+        console.error("Error signing in:", error);
+      });
+  };
+
+  const logOut = () => {
+    auth
+      .signOut()
+      .then(() => {
+        setUser(null);
+        console.log("User signed out");
+      })
+      .catch((error) => {
+        console.error("Error signing out:", error);
+      });
+  };
+
   return (
     <>
-      <p>Firestore Check {name}</p>
+      <p>Firestore Authentication</p>
+
+      <div>
+        {!user && (
+          <>
+            <input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <button onClick={signUp}>Sign up</button>
+            <button onClick={signIn}>Sign In</button>
+          </>
+        )}
+
+        {user && <button onClick={logOut}>Log out</button>}
+      </div>
+      {user && <p>Welcome, {user.email}</p>}
     </>
   );
 }
