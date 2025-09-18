@@ -7,7 +7,7 @@ import {
 } from "firebase/auth";
 import { app, db, auth } from "./lib/firebase.js";
 import Todo from "./components/Todo.jsx";
-// Import the functions you need from the SDKs you need
+// Import the functions you need from the SDKs
 // import { getAnalytics } from "firebase/analytics";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -23,12 +23,6 @@ function App() {
     async function testFirestore() {
       const docRef = doc(db, "firebaseCollection", "firebaseDocument");
       const docSnap = await getDoc(docRef);
-
-      // Updates specific fields
-      // await updateDoc(docRef, {
-      //   age: "9002",
-      //   name: "Mary Poppins",
-      // });
 
       if (docSnap.exists()) {
         setName(docSnap.data().name);
